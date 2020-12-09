@@ -10,6 +10,7 @@
   "dependencies": {
     "antd": "^4.9.1",
     "core-js": "^3.6.5",
+    "lodash": "^4.17.20",
     "uuid": "^8.3.1",
     "vue": "^2.6.11",
     "vue-in-viewport-directive": "^2.0.2",

@@ -8,22 +8,19 @@
       />
       <br/>
       <label class="title-label" :class="{invalidStyle: displayInputInvalited}">title is required</label>
-      <div v-if="submitted && $v.TaskTitle.$error" class="invalid-feedback">
-        <span v-if="!$v.TaskTitle.required">Title is required</span>
-      </div>
       <p class="des-title" style="marginRight: 220px ">Description</p>
       <textarea
         v-model="TaskDescription"
         class="input-description"
         placeholder="Descrioption"
-      ></textarea>
+      ></textarea> <br/>
+      <label class="title-label" :class="{invalidStyle: displayInputInvalited}">title is required</label>
       <div class="select-area">
         <div class="input-date-area">
           <p>Due date</p>
           <input
             v-model="TaskDueDate"
             type="date"
-            value="2018-07-22"
             class="date-select"
             id="date"
           />
@@ -32,7 +29,7 @@
           <p>priority</p>
           <select v-model="TaskPriority">
             <option value="1">Not Important</option>
-            <option value="2" selected>Normal</option>
+            <option value="2" >Normal</option>
             <option value="3">Important</option>
           </select>
         </div>
@@ -65,7 +62,7 @@ export default {
 
   methods: {
     addTask() {
-      if (this.TaskTitle.length < 1) {
+      if (this.TaskTitle.length < 1 || this.TaskDescription.length < 1) {
         this.displayInputInvalited = true
       } else {
         const newTask = {

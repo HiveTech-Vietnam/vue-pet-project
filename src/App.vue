@@ -1,24 +1,35 @@
 <template>
   <div id="app">
     <div class="add-task-form">
-      <AddTask v-on:addTask="handleAddTask($event)" :class="{toogleForm: isAdd}" />
+      <AddTask
+        v-on:addTask="handleAddTask($event)"
+        :class="{ toogleForm: isAdd }"
+      />
     </div>
     <div class="main">
-      <button @click="toogleAddForm" class="add-new-task" >Add New Task</button>
-    
+      <button @click="toogleAddForm" class="add-new-task">Add New Task</button>
       <h2>Todolist</h2>
-
+      <div class="sort-task">
+        <label>Sort</label> <br />
+        <select v-model="sortQuery">
+          <option value="0">All</option>
+          <option value="1">Not inportant</option>
+          <option value="2">Normal</option>
+          <option value="3">Important</option>
+        </select>
+      </div>
       <br />
-      <Search
-        v-on:querySearchKey="handleSearch($event)"
-        style="marginBottom:15px"
+      <input
+        v-model="searchQuery"
+        placeholder="Search task..."
+        class="search-task"
       />
       <TaskList
         v-on:DeleteTask="DeleteTask($event)"
         v-on:UpdateTask="handleUpdate($event)"
-        v-on:handleDoneTask="handleDoneTask($event)"
+        v-on:handleDoneTask="handleClickedTask($event)"
         v-on:getDataUpdate="getDataUpdate($event)"
-        v-bind:todos="todos"
+        v-bind:filterTask="filterTask"
       />
       <div id="bulk-action">
         <button class="done-all-btn " v-on:click="doneAll">Done all</button>
@@ -33,68 +44,96 @@
 <script>
 import AddTask from "./components/AddTask";
 import TaskList from "./components/TaskList";
-import Search from "./components/Search";
+import _ from "lodash";
+
 export default {
   name: "App",
   components: {
     AddTask,
     TaskList,
-    Search,
   },
-  created () {
-      this.localData();
-      this.todos = JSON.parse(localStorage.getItem('todos'))
+  created() {
+    this.localData();
+    this.todos = JSON.parse(localStorage.getItem("todos"));
   },
-
+  beforeUpdate() {
+    this.sortTask();
+  },
   methods: {
     localData: function() {
       let parsed = JSON.stringify(this.todos);
-      localStorage.setItem('todos', parsed)
+      localStorage.setItem("todos", parsed);
     },
-   
+
     handleAddTask(task) {
       this.todos = [...this.todos, task];
       this.localData();
-      this.isAdd = true
+      this.isAdd = true;
     },
     DeleteTask: function(id) {
       let index = this.todos.findIndex((task) => task.id === id);
       this.todos.splice(index, 1);
-      this.localData()
+      this.localData();
     },
     handleUpdate(id) {
       this.taskUpdate = this.todos.findIndex((task) => task.id === id);
-      this.localData()
+      this.localData();
     },
-    handleDoneTask(id) {
-      let doneTask = this.todos.find((task) => task.id === id);
-      doneTask.status = !doneTask.status;
-      this.localData()
-    },
+
     getDataUpdate(data) {
       this.dataUpdate = data;
       this.todos.splice(this.taskUpdate, 1, this.dataUpdate);
-      this.localData()
-
+      this.localData();
     },
-    handleSearch(key) {
-      this.todos = this.todos.filter(
-        (task) => task.title.indexOf(key.toLowerCase()) != -1
-      );
+
+    toogleAddForm() {
+      this.isAdd = !this.isAdd;
+    },
+    //sort task
+    sortTask() {
+      if (this.sortQuery === "0") {
+        this.sortData = [...this.todos];
+      }
+      if (this.sortQuery === "1") {
+        this.sortData = this.todos.filter((task) => task.priority === "1");
+      }
+      if (this.sortQuery === "2") {
+        this.sortData = this.todos.filter((task) => task.priority === "2");
+      }
+      if (this.sortQuery === "3") {
+        this.sortData = this.todos.filter((task) => task.priority === "3");
+      }
+      return this.sortData;
+    },
+    //todo: in bulk action, save id clicked in temporaryId arr to handle when trigger each of bulk action
+    handleClickedTask(id) {
+      this.temporaryId = [...this.temporaryId, id];
     },
     removeAll() {
-      this.todos = [];
-      this.localData()
-
+      for(let x = 0; x <this.temporaryId.length; x++ ){
+        this.todos = this.todos.filter(task => task.id != this.temporaryId[x])
+      }
+      this.localData();
     },
+
     doneAll() {
-      this.todos.forEach((todo) => (todo.status = true));
-      this.localData()
-
-    },
-    toogleAddForm(){
-      this.isAdd = !this.isAdd;
+    for(let y = 0; y < this.temporaryId.length; y++){
+      this.todos.forEach(task => {
+        if(task.id === this.temporaryId[y]){
+          task.status = true
+        }
+      });
     }
+      this.localData();
+    },
+  },
+  computed: {
+    filterTask() {
+      console.log(this.todos);
+      return _.filter(this.sortData, (task) =>
+        task.title.toLowerCase().includes(this.searchQuery.toLowerCase())
+      );
+    },
   },
   data() {
     return {
@@ -103,6 +142,10 @@ export default {
       keySearch: "",
       taskUpdate: "",
       isAdd: true,
+      searchQuery: "",
+      sortQuery: "0",
+      sortData: null,
+      temporaryId: [],
     };
   },
 };
@@ -175,7 +218,7 @@ export default {
   border: none;
   color: white;
 }
-.add-new-task{
+.add-new-task {
   background: #d9534f;
   border: none;
   outline: none;
@@ -184,24 +227,43 @@ export default {
   border-radius: 4px;
   display: none;
 }
-
-
-
-@media screen and (max-width: 1024px){
-  .add-new-task{
-    display: block ;
+.sort-task {
+  position: absolute;
+  right: 10%;
+  top: 4%;
+}
+.sort-task select {
+  width: 100px;
+  height: 30px;
+  border-radius: 5px;
+  background: #d9534f;
+  color: white;
+  outline: none;
+  margin-top: 10px;
+  border: none;
+}
+.search-task {
+  width: 500px;
+  height: 30px;
+  padding-left: 50px;
+  outline: none;
+  margin-bottom: 10px;
+}
+@media screen and (max-width: 1024px) {
+  .add-new-task {
+    display: block;
   }
-  #app{
+  #app {
     display: flex;
     flex-direction: column;
     justify-content: center;
     margin-left: 40px;
   }
 
-  .toogleForm{
+  .toogleForm {
     display: none;
   }
-  #bulk-action{
+  #bulk-action {
     position: absolute;
     bottom: 0;
   }

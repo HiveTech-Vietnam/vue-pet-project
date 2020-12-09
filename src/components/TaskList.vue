@@ -1,6 +1,6 @@
 <template>
     <div class="wrap-task-list">
-      <div class="task-list" v-for="todo of todos" v-bind:key="todo.id"  >
+      <div class="task-list" v-for="todo of filterTask" v-bind:key="todo.id"  >
         <TaskItem style="paddingBottom: 10px" v-bind:todo="todo" 
         v-on:handleDelete="handleDelete($event)" 
         v-on:handleUpdate="handleUpdate($event)" 
@@ -33,7 +33,7 @@ export default {
           this.$emit('getDataUpdate', updateTask)
         }
     },
-    props:['todos']
+    props:['filterTask']
 }
 </script>
 
@@ -43,7 +43,5 @@ export default {
 
 }
 
-.done-task{
-  text-decoration: line-through;
-}
+
 </style>
