@@ -6,7 +6,7 @@
         type="checkbox"
         @change="handleDoneTask(todo.id)"
       />
-      <p class="title" v-bind:class="{ done:todo.status }">{{ todo.title }}</p>
+      <p class="title" v-bind:class="{ done: todo.status }">{{ todo.title }}</p>
       <div class="item-action">
         <button class="upd" @click="handleUpdate(todo.id)">Detail</button>
         <button class="del" @click="handleDelete(todo.id)">Remove</button>
@@ -30,14 +30,19 @@
         <div class="select-area">
           <div class="input-date-area">
             <p style="fontSize:14px">Due date</p>
-            <input type="date" class="date-select" 
-            id="datePicker" v-bind:value="todo.dueDate" @change="updateTaskDueDate"  />
+            <input
+              type="date"
+              class="date-select"
+              id="datePicker"
+              v-bind:value="todo.dueDate"
+              @change="updateTaskDueDate"
+            />
           </div>
           <div class="input-priority-area">
             <p style="fontSize:14px">Priority</p>
-            <select v-bind:value="todo.priority" @change="updateTaskPriority" >
+            <select v-bind:value="todo.priority" @change="updateTaskPriority">
               <option value="1">Not Important</option>
-              <option value="2" >Normal</option>
+              <option value="2">Normal</option>
               <option value="3">Important</option>
             </select>
           </div>
@@ -50,10 +55,24 @@
 </template>
 
 <script>
-
 export default {
   name: "TaskItem",
   props: ["todo"],
+  created(){
+    console.log(this.propsToStateToDo)
+  },
+  // note declare data before method
+  data() {
+    return {
+      update: true,
+      taskTitle: "",
+      taskDescription: "",
+      taskDueDate: "",
+      taskPriority: "",
+      status: false,
+      propsToStateToDo: this.todo 
+    };
+  },
   methods: {
     handleDelete(id) {
       this.$emit("handleDelete", id);
@@ -66,46 +85,32 @@ export default {
       this.$emit("handleDoneTask", id);
     },
     updateTaskTitle(e){
-      this.TaskTitle = e.target.value
+      this.taskTitle = e.target.value
     },
-    updateTaskDes(e){
-      this.TaskDescription = e.target.value
+    updateTaskDes(e) {
+      this.taskDescription = e.target.value;
     },
-    updateTaskDueDate(e){
-      this.TaskDueDate = e.target.value
+    updateTaskDueDate(e) {
+      this.taskDueDate = e.target.value;
     },
-    updateTaskPriority(e){
-      this.TaskPriority = e.target.value
+    updateTaskPriority(e) {
+      this.taskPriority = e.target.value;
     },
-    updateTask(){
+    updateTask() {
       const updateTask = {
         id: this.todo.id,
-        title: this.TaskTitle,
-        description: this.TaskDescription,
-        dueDate: this.TaskDueDate,
-        priority: this.TaskPriority,
-        status: this.status
+        title: this.taskTitle,
+        description: this.taskDescription,
+        dueDate: this.taskDueDate,
+        priority: this.taskPriority,
+        status: this.status,
       };
-      this.$emit('updateTask', updateTask);
-      this.update = !this.update
+      this.$emit("updateTask", updateTask);
+      this.update = !this.update;
     },
-  },
-  data() {
-    return {
-      update: true,
-      TaskTitle: '',
-      TaskDescription: '',
-      TaskDueDate: '',
-      TaskPriority: '', 
-      status: false
-    };
   },
 };
 </script>
-
-
-
-
 
 <style scoped>
 .item {
@@ -154,7 +159,7 @@ export default {
 .done {
   text-decoration: line-through;
 }
-.input-task{
+.input-task {
   width: 90%;
   height: 30px;
   margin-top: 20px;
@@ -162,23 +167,23 @@ export default {
   margin-right: 10px;
   outline: none;
 }
-.input-description{
+.input-description {
   width: 90%;
   height: 50px;
   resize: none;
 }
-.des-title{
+.des-title {
   font-size: 14px;
-  float:left;
+  float: left;
   margin-left: 20px;
 }
-.select-area{
+.select-area {
   display: flex;
   flex-direction: row;
   justify-content: space-around;
   width: 100%;
 }
-.submit-btn{
+.submit-btn {
   width: 90%;
   background: #4caf50;
   color: white;

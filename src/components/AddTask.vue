@@ -3,35 +3,56 @@
     <form @submit.prevent="addTask">
       <input
         placeholder="Add new task..."
-        v-model="TaskTitle"
+        v-model="taskTitle"
         class="input-task"
       />
-      <br/>
-      <label class="title-label" :class="{invalidStyle: displayInputInvalited}">title is required</label>
+      <br />
+      <label
+        class="title-label"
+        :class="{ invalidStyle: displayInputTitleInvalited }"
+        >title is required</label
+      >
       <p class="des-title" style="marginRight: 220px ">Description</p>
       <textarea
-        v-model="TaskDescription"
+        v-model="taskDescription"
         class="input-description"
         placeholder="Descrioption"
-      ></textarea> <br/>
-      <label class="title-label" :class="{invalidStyle: displayInputInvalited}">title is required</label>
+      ></textarea>
+      <br />
+      <label
+        class="title-label"
+        :class="{ invalidStyle: displayInputDesInvalited }"
+        >description is required</label
+      >
       <div class="select-area">
         <div class="input-date-area">
           <p>Due date</p>
           <input
-            v-model="TaskDueDate"
+            v-model="taskDueDate"
             type="date"
             class="date-select"
             id="date"
           />
+          <br/>
+          <label
+        class="title-label"
+        :class="{ invalidStyle: displayInputDateInvalited }"
+        >due date is required</label
+      >
         </div>
         <div class="input-priority-area">
           <p>priority</p>
-          <select v-model="TaskPriority">
+          <select v-model="taskPriority">
             <option value="1">Not Important</option>
-            <option value="2" >Normal</option>
+            <option value="2">Normal</option>
             <option value="3">Important</option>
           </select>
+          <br />
+          <label
+            class="title-label"
+            :class="{ invalidStyle: displayInputPriorityInvalited }"
+            >priority is required</label
+          >
         </div>
       </div>
 
@@ -50,44 +71,58 @@ export default {
   },
   data() {
     return {
-      TaskTitle: "",
-      TaskDescription: "",
-      TaskDueDate: "",
-      TaskPriority: "2",
+      taskTitle: "",
+      taskDescription: "",
+      taskDueDate: "",
+      taskPriority: "2",
       isDone: false,
       submitted: false,
-      displayInputInvalited: false,
+      displayInputTitleInvalited: false,
+      displayInputDesInvalited: false,
+      displayInputDateInvalited: false,
+      displayInputPriorityInvalited: false,
     };
   },
 
   methods: {
     addTask() {
-      if (this.TaskTitle.length < 1 || this.TaskDescription.length < 1) {
-        this.displayInputInvalited = true
-      } else {
+      //todo: check validate form
+        if(this.taskTitle.length < 1){
+          this.displayInputTitleInvalited = true
+        }
+        else if(this.taskDescription.length < 1){
+          this.displayInputDesInvalited = true
+        }
+        else if(this.taskDueDate == ""){
+          this.displayInputDateInvalited = true
+        }
+        else if(this.taskPriority == ""){
+          this.displayInputPriorityInvalited = true
+        }
+       else {
         const newTask = {
           id: uuidv4(),
-          title: this.TaskTitle,
-          description: this.TaskDescription,
-          dueDate: this.TaskDueDate,
-          priority: this.TaskPriority,
+          title: this.taskTitle,
+          description: this.taskDescription,
+          dueDate: this.taskDueDate,
+          priority: this.taskPriority,
           status: this.isDone,
         };
         //send up to parent
         this.$emit("addTask", newTask);
-        this.TaskTitle = "";
-        this.TaskDescription = "";
-        this.TaskDueDate = "";
-        this.TaskPriority = "";
-        this.displayInputInvalited = false
+        this.taskTitle = "";
+        this.taskDescription = "";
+        this.displayInputTitleInvalited = false;
+        this.displayInputDesInvalited = false;
+        this.displayInputDateInvalited = false;
+        this.displayInputPriorityInvalited = false;
       }
     },
-
+    //note: dont handle in real DOM
     // set default date is today
     getDate() {
       var today = new Date();
-
-      document.getElementById("date").value =
+      this.taskDueDate =
         today.getFullYear() +
         "-" +
         ("0" + (today.getMonth() + 1)).slice(-2) +
@@ -129,6 +164,7 @@ export default {
 .select-area {
   display: flex;
   flex-direction: row;
+  margin-top: 20px;
 }
 .input-date-area {
   margin-left: 20px;
@@ -148,40 +184,40 @@ export default {
   outline: none;
 }
 
-.title-label{
+.title-label {
   color: red;
   font-size: 12px;
   float: left;
   margin-left: 20px;
-  display: none;  
+  display: none;
 }
-.invalidStyle{
+.invalidStyle {
   display: block;
 }
-@media screen and (max-width: 1024px){
-  .add-task-form{
+@media screen and (max-width: 1024px) {
+  .add-task-form {
     height: 200px;
     max-width: 580px;
     border: 1px solid grey;
   }
-  .input-task{
+  .input-task {
     width: 100%;
   }
-  .input-description{
+  .input-description {
     height: 40px;
     width: 100%;
     margin-top: 20px;
   }
-  .des-title{
-    display:none;
+  .des-title {
+    display: none;
   }
-  .add-btn{
-    width:100px;
+  .add-btn {
+    width: 100px;
   }
-  .select-area{
+  .select-area {
     justify-content: center;
   }
-  .input-date-area{
+  .input-date-area {
     margin-right: 200px;
   }
 }

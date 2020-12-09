@@ -2,7 +2,7 @@
   <div id="app">
     <div class="add-task-form">
       <AddTask
-        v-on:addTask="handleAddTask($event)"
+        @addTask="handleAddTask($event)"
         :class="{ toogleForm: isAdd }"
       />
     </div>
@@ -32,9 +32,9 @@
         v-bind:filterTask="filterTask"
       />
       <div id="bulk-action">
-        <button class="done-all-btn " v-on:click="doneAll">Done all</button>
+        <button class="done-all-btn " v-on:click="doneAll">Done</button>
         <button v-on:click="removeAll" class="remove-all-btn">
-          Remove all
+          Remove
         </button>
       </div>
     </div>
@@ -53,88 +53,13 @@ export default {
     TaskList,
   },
   created() {
-    this.localData();
+    this.saveToLocalData();
     this.todos = JSON.parse(localStorage.getItem("todos"));
   },
   beforeUpdate() {
     this.sortTask();
   },
-  methods: {
-    localData: function() {
-      let parsed = JSON.stringify(this.todos);
-      localStorage.setItem("todos", parsed);
-    },
-
-    handleAddTask(task) {
-      this.todos = [...this.todos, task];
-      this.localData();
-      this.isAdd = true;
-    },
-    DeleteTask: function(id) {
-      let index = this.todos.findIndex((task) => task.id === id);
-      this.todos.splice(index, 1);
-      this.localData();
-    },
-    handleUpdate(id) {
-      this.taskUpdate = this.todos.findIndex((task) => task.id === id);
-      this.localData();
-    },
-
-    getDataUpdate(data) {
-      this.dataUpdate = data;
-      this.todos.splice(this.taskUpdate, 1, this.dataUpdate);
-      this.localData();
-    },
-
-    toogleAddForm() {
-      this.isAdd = !this.isAdd;
-    },
-    //sort task
-    sortTask() {
-      if (this.sortQuery === "0") {
-        this.sortData = [...this.todos];
-      }
-      if (this.sortQuery === "1") {
-        this.sortData = this.todos.filter((task) => task.priority === "1");
-      }
-      if (this.sortQuery === "2") {
-        this.sortData = this.todos.filter((task) => task.priority === "2");
-      }
-      if (this.sortQuery === "3") {
-        this.sortData = this.todos.filter((task) => task.priority === "3");
-      }
-      return this.sortData;
-    },
-    //todo: in bulk action, save id clicked in temporaryId arr to handle when trigger each of bulk action
-    handleClickedTask(id) {
-      this.temporaryId = [...this.temporaryId, id];
-    },
-    removeAll() {
-      for(let x = 0; x <this.temporaryId.length; x++ ){
-        this.todos = this.todos.filter(task => task.id != this.temporaryId[x])
-      }
-      this.localData();
-    },
-
-    doneAll() {
-    for(let y = 0; y < this.temporaryId.length; y++){
-      this.todos.forEach(task => {
-        if(task.id === this.temporaryId[y]){
-          task.status = true
-        }
-      });
-    }
-      this.localData();
-    },
-  },
-  computed: {
-    filterTask() {
-      console.log(this.todos);
-      return _.filter(this.sortData, (task) =>
-        task.title.toLowerCase().includes(this.searchQuery.toLowerCase())
-      );
-    },
-  },
+  // note: declare data before methods
   data() {
     return {
       todos: [],
@@ -147,6 +72,85 @@ export default {
       sortData: null,
       temporaryId: [],
     };
+  },
+  methods: {
+    saveToLocalData() {
+      let parsed = JSON.stringify(this.todos);
+      localStorage.setItem("todos", parsed);
+    },
+
+    handleAddTask(task) {
+      this.todos = [...this.todos, task];
+      this.saveToLocalData();
+      this.isAdd = true;
+    },
+    DeleteTask(id) {
+      let index = this.todos.findIndex((task) => task.id === id);
+      this.todos.splice(index, 1);
+      this.saveToLocalData();
+    },
+    handleUpdate(id) {
+      this.taskUpdate = this.todos.findIndex((task) => task.id === id);
+      this.saveToLocalData();
+    },
+
+    getDataUpdate(data) {
+      this.dataUpdate = data;
+      this.todos.splice(this.taskUpdate, 1, this.dataUpdate);
+      this.saveToLocalData();
+    },
+
+    toogleAddForm() {
+      this.isAdd = !this.isAdd;
+    },
+    //sort task
+    sortTask() {
+      switch (this.sortQuery) {
+        case "0":
+          this.sortData = [...this.todos];
+          break;
+        case "1":
+          this.sortData = this.todos.filter((task) => task.priority === "1");
+          break;
+        case "2":
+          this.sortData = this.todos.filter((task) => task.priority === "2");
+          break;
+        case "3":
+          this.sortData = this.todos.filter((task) => task.priority === "3");
+          break;
+      }
+    },
+    //todo: in bulk action, save id of task-clicked in temporaryId arr to handle when trigger each of bulk action
+    handleClickedTask(id) {
+      this.temporaryId = [...this.temporaryId, id];
+    },
+    removeAll() {
+      for (let x = 0; x < this.temporaryId.length; x++) {
+        this.todos = this.todos.filter(
+          (task) => task.id != this.temporaryId[x]
+        );
+      }
+      this.saveToLocalData();
+    },
+
+    doneAll() {
+      for (let y = 0; y < this.temporaryId.length; y++) {
+        this.todos.forEach((task) => {
+          if (task.id === this.temporaryId[y]) {
+            task.status = true;
+          }
+        });
+      }
+      this.saveToLocalData();
+    },
+  },
+  computed: {
+    filterTask() {
+      console.log(this.todos);
+      return _.filter(this.sortData, (task) =>
+        task.title.toLowerCase().includes(this.searchQuery.toLowerCase())
+      );
+    },
   },
 };
 </script>
@@ -202,7 +206,7 @@ export default {
   margin-bottom: 10px;
 }
 .done-all-btn {
-  padding: 10px 15px;
+  padding: 10px 25px;
   background: #d9534f;
   border-radius: 5px;
   outline: none;
