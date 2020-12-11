@@ -24,7 +24,7 @@
         <textarea
           class="input-description"
           placeholder="Descrioption"
-          v-bind:value="todo.description"
+          :value="todo.description"
           @change="updateTaskDes"
         ></textarea>
         <div class="select-area">
@@ -34,13 +34,13 @@
               type="date"
               class="date-select"
               id="datePicker"
-              v-bind:value="todo.dueDate"
+              :value="todo.dueDate"
               @change="updateTaskDueDate"
             />
           </div>
           <div class="input-priority-area">
             <p style="fontSize:14px">Priority</p>
-            <select v-bind:value="todo.priority" @change="updateTaskPriority">
+            <select :value="todo.priority" @change="updateTaskPriority">
               <option value="1">Not Important</option>
               <option value="2">Normal</option>
               <option value="3">Important</option>
@@ -61,6 +61,12 @@ export default {
   created(){
     console.log(this.propsToStateToDo)
   },
+  beforeUpdate(){
+    this.renderTitlle(),
+    this.renderDescription(),
+    this.renderDueDate(),
+    this.renderPriority()
+  },
   // note declare data before method
   data() {
     return {
@@ -70,7 +76,10 @@ export default {
       taskDueDate: "",
       taskPriority: "",
       status: false,
-      propsToStateToDo: this.todo 
+      tempoTitle: '',
+      tempoDescription:'',
+      tempoDueDate:'',
+      tempoPriority:''
     };
   },
   methods: {
@@ -85,7 +94,8 @@ export default {
       this.$emit("handleDoneTask", id);
     },
     updateTaskTitle(e){
-      this.taskTitle = e.target.value
+      this.taskTitle = e.target.value;
+      this.tempoTitle = e.target.value
     },
     updateTaskDes(e) {
       this.taskDescription = e.target.value;
@@ -95,6 +105,42 @@ export default {
     },
     updateTaskPriority(e) {
       this.taskPriority = e.target.value;
+    },
+     renderTitlle(){
+      if(this.tempoTitle == ''){
+        this.taskTitle = this.todo.title
+      }
+      else{
+        this.taskTitle = this.tempoTitle
+      }
+      return this.taskTitle
+    },
+    renderDescription(){
+      if(this.tempoDescription == ''){
+        this.taskDescription = this.todo.description
+      }
+      else{
+        this.taskDescription = this.tempoDescription
+      }
+      return this.taskDescription
+    },
+    renderDueDate(){
+      if(this.tempoDueDate == ''){
+        this.taskDueDate = this.todo.dueDate
+      }
+      else{
+        this.taskDueDate = this.tempoDueDate
+      }
+      return this.taskDueDate
+    },
+    renderPriority(){
+      if(this.tempoPriority == ''){
+        this.taskPriority = this.todo.priority
+      }
+      else{
+        this.taskPriority = this.tempoPriority
+      }
+      return this.taskPriority
     },
     updateTask() {
       const updateTask = {
@@ -109,6 +155,7 @@ export default {
       this.update = !this.update;
     },
   },
+  
 };
 </script>
 
